@@ -61,15 +61,27 @@ program
 
 program
   .command('attach')
-  .description('route local packages in this repo (via .npmrc)')
+  .description('route local packages in this repo (via .npmrc) and sync them into node_modules')
   .option(...YES)
   .option('--all', "offer every published package, not just this repo's dependencies")
+  .option('--no-sync', 'route the .npmrc only; do not pull the packages into node_modules')
   .action((opts) => commands.attach(process.cwd(), opts));
 
 program
+  .command('sync')
+  .description('pull the latest published bytes into node_modules; the committed lockfile stays pristine')
+  .action(() => commands.sync(process.cwd()));
+
+program
+  .command('keep')
+  .description('un-hide the current lockfile so you can commit or discard it (hakoba never commits)')
+  .action(() => commands.keep(process.cwd()));
+
+program
   .command('detach')
-  .description('undo attach (restore .npmrc)')
-  .action(() => commands.detach(process.cwd()));
+  .description('undo attach: restore .npmrc + the baseline lockfile')
+  .option('--keep', 'un-hide the current lockfile instead of restoring the baseline')
+  .action((opts) => commands.detach(process.cwd(), opts));
 
 program.hook('preAction', (_program, action) => ui.intro(`hakoba ${action.name()}`));
 

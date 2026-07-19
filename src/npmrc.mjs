@@ -1,52 +1,20 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { sh, shOk } from './exec.mjs';
+import {
+  addExclude,
+  isTracked,
+  removeExclude,
+  skipWorktree,
+} from './gitfile.mjs';
 
 /**
  * The attach/detach mechanism: routing chosen packages at the local registry by editing `.npmrc`,
- * reversibly, and keeping the edit out of git.
+ * reversibly, and keeping the edit out of git (via `gitfile`).
  */
 
 export const START = '# >>> hakoba >>>';
 const END = '# <<< hakoba <<<';
 const TAG = '#hakoba# ';
-
-// ── git ────────────────────────────────────────────────────────────────────────────────────────
-
-function gitDir(cwd) {
-  try {
-    return sh('git', ['rev-parse', '--git-dir'], { cwd }).trim();
-  } catch {
-    return null;
-  }
-}
-
-function isTracked(cwd, file) {
-  return shOk('git', ['ls-files', '--error-unmatch', file], { cwd });
-}
-
-function excludePath(cwd) {
-  const g = gitDir(cwd);
-  return g ? join(cwd, g, 'info', 'exclude') : null;
-}
-
-function addExclude(cwd, entry) {
-  const p = excludePath(cwd);
-  if (!p) return;
-  const content = existsSync(p) ? readFileSync(p, 'utf8') : '';
-  if (!content.split('\n').includes(entry)) {
-    writeFileSync(p, `${content.replace(/\s*$/, '')}\n${entry}\n`);
-  }
-}
-
-function removeExclude(cwd, entry) {
-  const p = excludePath(cwd);
-  if (!p || !existsSync(p)) return;
-  const kept = readFileSync(p, 'utf8')
-    .split('\n')
-    .filter((l) => l !== entry);
-  writeFileSync(p, kept.join('\n'));
-}
 
 // ── the marker block ───────────────────────────────────────────────────────────────────────────
 
@@ -107,9 +75,7 @@ export function apply(cwd, lines) {
     .join('\n');
   writeFileSync(file, result);
   if (!existed) addExclude(cwd, '.npmrc');
-  else if (isTracked(cwd, file)) {
-    shOk('git', ['update-index', '--skip-worktree', '.npmrc'], { cwd });
-  }
+  else if (isTracked(cwd, file)) skipWorktree(cwd, '.npmrc', true);
 }
 
 /** Undo {@link apply}. Returns false when there was nothing attached. */
@@ -122,9 +88,8 @@ export function restore(cwd) {
     removeExclude(cwd, '.npmrc');
   } else {
     writeFileSync(file, `${restored.replace(/\s*$/, '')}\n`);
-    if (isTracked(cwd, file)) {
-      shOk('git', ['update-index', '--no-skip-worktree', '.npmrc'], { cwd });
-    } else removeExclude(cwd, '.npmrc');
+    if (isTracked(cwd, file)) skipWorktree(cwd, '.npmrc', false);
+    else removeExclude(cwd, '.npmrc');
   }
   return true;
 }

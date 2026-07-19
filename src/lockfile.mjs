@@ -28,19 +28,20 @@ export function lockfilePath(cwd, agent) {
  *
  * This is the crux. A plain install — even `--force` — will **not** pick up a same-version republish:
  * the lockfile pins the version to an integrity hash, so the manager reuses the cached tarball and
- * never learns the bytes changed. `pnpm update <pkgs>` re-reads the registry and pulls the new
- * content, touching only the lockfile (no `package.json` churn) — measured, and the mechanism sync
- * relies on. Other agents aren't wired yet rather than guessing a wrong command.
+ * never learns the bytes changed. `<agent> update <pkgs>` re-reads the registry and pulls the new
+ * content, touching only the lockfile (no `package.json` churn) — measured for pnpm and npm, and the
+ * mechanism sync relies on. yarn/bun aren't wired yet rather than guessing a wrong command.
  */
 const UPDATE = {
   pnpm: (pkgs) => ['update', ...pkgs],
+  npm: (pkgs) => ['update', ...pkgs],
 };
 
 /** Re-resolve `packages` from the registry in `cwd`, updating node_modules + the lockfile. */
 export function reresolve(cwd, agent, packages) {
   const build = UPDATE[agent] ?? UPDATE[agent.split('@')[0]];
   if (!build) {
-    throw new Error(`hakoba sync supports pnpm for now, not ${agent}`);
+    throw new Error(`hakoba sync supports pnpm and npm for now, not ${agent}`);
   }
   shPm(agent.split('@')[0], build(packages), { cwd });
 }

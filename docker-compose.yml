@@ -1,0 +1,15 @@
+name: hakoniwa-hakoba
+
+services:
+  registry:
+    image: verdaccio/verdaccio:6
+    container_name: hakoba
+    restart: always
+    ports:
+      - "4873:4873"
+    volumes:
+      - ./conf:/verdaccio/conf
+      - hakoba-storage:/verdaccio/storage
+
+volumes:
+  hakoba-storage:

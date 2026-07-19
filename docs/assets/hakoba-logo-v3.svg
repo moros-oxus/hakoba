@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 290" width="100%" height="100%">
+  <defs>
+    <!-- Hard, blocky drop shadow that anchors the layout at all scales -->
+    <filter id="ultra-sharp-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="8" dy="12" stdDeviation="0" flood-color="#0c0d10" flood-opacity="1" />
+    </filter>
+  </defs>
+
+  <!-- Deep Charcoal Background -->
+  <rect width="100%" height="100%" fill="#16161a" />
+
+  <defs>
+    <!-- True Monochrome Palette -->
+    <!-- Primary Focus Box: The Connecting Bridge (High Contrast Deep Charcoal) -->
+     <linearGradient id="PrimaryTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff4d4d"/>
+      <stop offset="100%" stop-color="#ff4d4d"/>
+    </linearGradient>
+    <linearGradient id="PrimaryLeft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cc1111"/>
+      <stop offset="100%" stop-color="#cc1111"/>
+    </linearGradient>
+    <linearGradient id="PrimaryRight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#990000"/>
+      <stop offset="100%" stop-color="#990000"/>
+    </linearGradient>
+
+    <!-- Secondary Structural Units: Pillar Boxes (Subdued Architectural Gray) -->
+    <linearGradient id="SecondaryTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="SecondaryLeft" x1="0" y1="0" x2="0" y2="1">
+     <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="SecondaryRight" x1="0" y1="0" x2="0" y2="1">
+       <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+
+    <linearGradient id="TertiaryRight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#16161a"/>
+      <stop offset="100%" stop-color="#16161a"/>
+    </linearGradient>
+  </defs>
+
+  
+  
+	<g id="Layer 1" transform="translate(60, -10) scale(.6)">
+		<g id="Right Pillar">
+			<g id="cube3">
+				<path fill="url(#SecondaryTop)"  d="m228.68 136.33l65.97-35.33 65.96 35.33-65.96 35.34z"  />
+				<path fill="url(#SecondaryLeft)"  d="m228.68 136.33l65.97 35.34v42.4l-65.97-35.34z" />
+				<path fill="url(#TertiaryRight)"  d="m360.61 136.33v42.4l-65.96 35.34v-42.4z" />
+			</g>
+			<g id="cube2">
+				<path fill="url(#SecondaryTop)"  d="m298.54 167.08l65.97-35.33 65.96 35.33-65.96 35.33z"/>
+				<path fill="url(#SecondaryLeft)"  d="m298.54 167.08l65.97 35.33v56.53l-65.97-35.33z"/>
+				<path fill="url(#TertiaryRight)" d="m430.47 167.08v56.53l-65.96 35.33v-56.53z"/>
+			</g>
+			<g id="cube1">
+				<path fill="url(#SecondaryTop)"  d="m368.41 197.82l65.96-35.33 65.96 35.33-65.96 35.34z"/>
+				<path fill="url(#SecondaryLeft)"  d="m368.41 197.82l65.96 35.34v70.66l-65.96-35.33z"/>
+				<path fill="url(#SecondaryRight)" d="m500.33 197.82v70.67l-65.96 35.33v-70.66z"/>
+			</g>
+		</g>
+		<g id="cube2">
+			<path fill="url(#PrimaryTop)"  d="m193.09 219.02l65.97-35.33 65.96 35.33-65.96 35.34z"/>
+			<path fill="url(#PrimaryLeft)"  d="m193.09 219.02l65.97 35.34v56.53l-65.97-35.33z"/>
+			<path fill="url(#PrimaryRight)" d="m325.02 219.02v56.54l-65.96 35.33v-56.53z"/>
+		</g>
+		<g id="Left Pillar">
+			<g id="cube3">
+				<path fill="url(#SecondaryTop)"  d="m11 250.81l65.96-35.33 65.97 35.33-65.97 35.34z"/>
+				<path fill="url(#SecondaryLeft)"  d="m11 250.81l65.96 35.34v42.4l-65.96-35.34z"/>
+				<path fill="url(#TertiaryRight)"  d="m142.93 250.81v42.4l-65.97 35.34v-42.4z"/>
+			</g>
+			<g id="cube2">
+				<path fill="url(#SecondaryTop)"  d="m79.54 281.56l65.97-35.34 65.96 35.34-65.96 35.33z"/>
+				<path fill="url(#SecondaryLeft)"  d="m79.54 281.56l65.97 35.33v56.53l-65.97-35.33z"/>
+				<path fill="url(#TertiaryRight)" d="m211.47 281.56v56.53l-65.96 35.33v-56.53z"/>
+			</g>
+			<g id="cube1">
+				<path fill="url(#SecondaryTop)"  d="m149.4 312.3l65.97-35.33 65.96 35.33-65.96 35.34z"/>
+				<path fill="url(#SecondaryLeft)"  d="m149.4 312.3l65.97 35.34v70.66l-65.97-35.33z"/>
+				<path fill="url(#SecondaryRight)" d="m281.33 312.3v70.67l-65.96 35.33v-70.66z"/>
+			</g>
+		</g>
+	</g>
+
+  <!-- ==================== TYPOGRAPHY BRANDING ==================== -->
+  <!-- 
+    Shifted up from Y=220 to Y=140 to align perfectly with the newly cropped baseline height.
+    Maintains clean horizontal balance alongside the repositioned icon mark.
+  -->
+  <g transform="translate(425, 140)">
+    <!-- Main Logotype -->
+    <text x="0" y="0" 
+          font-family="system-ui, -apple-system, 'SF Pro Display', Roboto, sans-serif" 
+          font-size="72" 
+          font-weight="800" 
+          letter-spacing="2" 
+          fill="#e0e4e6">
+      hakoba
+    </text>
+
+    <!-- Subtext -->
+    <text x="5" y="42" 
+          font-family="system-ui, -apple-system, 'SF Pro Text', Roboto, sans-serif" 
+          font-size="14" 
+          font-weight="600" 
+          letter-spacing="8" 
+          fill="#ff4d4d">
+      LOCAL STAGING YARD
+    </text>
+
+    <!-- Base anchor bar -->
+    <line x1="2" y1="65" x2="135" y2="65" stroke="#ff4d4d" stroke-width="4" />
+  </g>
+
+</svg>

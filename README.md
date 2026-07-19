@@ -1,12 +1,12 @@
-<!-- <img src="./docs/assets/hakoba-logo.svg" alt="Hakoba: Local staging yard" /> -->
+<img src="./docs/assets/hakoba-logo-v3.svg" alt="Hakoba: Local staging yard" />
 
-<div style="display:flex; flex-direction: row; align-items: center; width: 100%; gap: 4rem; justify-content: center; background-color: #16161a; margin-bottom: 2em;">
+<!-- <div style="display:flex; flex-direction: row; align-items: center; width: 100%; gap: 4rem; justify-content: center; background-color: #16161a; margin-bottom: 2em;">
 <img src="./docs/assets/hakoba-logo-v2.svg" alt="Hakoba: Local staging yard"  style="aspect-ratio: 1/1; max-height: 20em;"/>
 <div style="display: flex; flex-direction: column;  background-image: linear-gradient(to right, #ff4d4d, #ff4d4d); background-position: bottom left; background-size: 44% 4px; background-repeat: no-repeat; padding-bottom: 10px;">
   <h1 style="color: #e0e4e6; font-size: 72px; line-height: .75em; font-weight: 800; letter-spacing: 2; border: none; margin: 0;">hakoba</h1>
   <p style="color: #ff4d4d; font-size: 14px; font-weight: 600; letter-spacing: 8; margin:0; text-transform: uppercase;">Local Staging Yard</p>
 </div>
-</div>
+</div> -->
 
 A local **dev-registry bridge** over [Verdaccio](https://verdaccio.org/). Publish work-in-progress
 packages to a private registry on your machine, then let any repo **attach** to consume them exactly

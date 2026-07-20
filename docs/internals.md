@@ -25,11 +25,16 @@ After publishing, hakoba re-resolves the published packages in every attached re
 them, so their `node_modules` pick up the new build at once — the effect of `yalc push`, but through a
 real registry.
 
-The re-resolve matters more than it looks. A plain install — even `--force` — will **not** pick up an
-in-place republish: the lockfile pins each version to an integrity hash, so the package manager reuses
-the cached tarball for an unchanged version and never learns the bytes changed. hakoba forces it with
-`<pm> update <packages>`, which re-reads the registry and pulls the new content while touching only the
-lockfile (no `package.json` churn). Supported for **pnpm** and **npm**; yarn and bun aren't wired yet.
+The re-resolve matters more than it looks, and is harder than it looks. An in-place, same-version
+republish is invisible to a plain install, to `--force`, to `<pm> update`, and even to deleting the
+lockfile: the lockfile pins each version to an integrity hash — a frozen snapshot of the old bytes — and
+nothing keyed on the version (which didn't change) ever reopens it, while the package manager keeps
+reusing the existing `node_modules` and its own resolution caches. The one thing that forces a genuine
+re-resolution is to **remove** each routed package and **add** it back with its original spec — an
+explicit resolve that bypasses every reuse path. hakoba first forgets the dev registry's cached
+packument (pnpm serves it past a republish; npm revalidates via etag on its own), then remove-and-re-adds
+each routed package in the project and field that declares it. `package.json` ends up unchanged; only the
+held lockfile churns. Supported for **pnpm** and **npm**; yarn and bun aren't wired yet.
 
 ## The session-local lockfile
 

@@ -53,3 +53,25 @@ export function dependencyNames(cwd) {
   }
   return [...names];
 }
+
+/**
+ * Where each of `names` is actually declared: the manifest's dir, the dependency field, and the
+ * version range. This is what lets a re-resolve remove-and-re-add a package with its exact original
+ * spec, in the right workspace project and the right field, leaving package.json unchanged.
+ *
+ * Only the installed fields are considered — a `peerDependencies`-only entry isn't a package you
+ * install, so there is nothing to re-resolve.
+ */
+export function dependencyDeclarations(cwd, names) {
+  const wanted = new Set(names);
+  const out = [];
+  for (const file of findPackageJsons(cwd)) {
+    const j = readJson(file);
+    for (const field of ['dependencies', 'devDependencies', 'optionalDependencies']) {
+      for (const [name, spec] of Object.entries(j?.[field] ?? {})) {
+        if (wanted.has(name)) out.push({ name, dir: dirname(file), field, spec });
+      }
+    }
+  }
+  return out;
+}

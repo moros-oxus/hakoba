@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { shPm, shPmOk } from './exec.mjs';
 import * as gitfile from './gitfile.mjs';
 import * as lockfile from './lockfile.mjs';
@@ -62,7 +63,9 @@ export async function publish(cwd, opts) {
     // Unpublish first so a stable version can be overwritten in place — no dev tags, so consumers'
     // version ranges never have to change to see the new build.
     const prior = unpublishCommand(`${pkg.name}@${pkg.version}`, REGISTRY);
-    shPmOk(prior.cmd, prior.args, { cwd });
+    // Neutral cwd: inside a package/workspace dir, npm resolves the spec against the local
+    // package context and rejects it ("Invalid name") — and the swallow would hide that.
+    shPmOk(prior.cmd, prior.args, { cwd: tmpdir() });
     shPm(cmd, args, { cwd: pkg.dir });
   }
   ui.log.success(`published ${chosen.map((p) => p.name).join(', ')} → ${REGISTRY}`);
@@ -98,7 +101,7 @@ export async function unpublish(cwd, opts) {
 
   for (const pkg of chosen) {
     const { cmd, args } = unpublishCommand(pkg.name, REGISTRY);
-    shPm(cmd, args, { cwd });
+    shPm(cmd, args, { cwd: tmpdir() });
   }
   ui.log.success(`unpublished ${chosen.map((p) => p.name).join(', ')}`);
 }

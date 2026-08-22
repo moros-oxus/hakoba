@@ -16,6 +16,28 @@ uplinks:
     maxage: 30m
 
 packages:
+  # Locally-developed packages: the local registry is AUTHORITATIVE — no uplink proxy,
+  # so the same-version overwrite publish never conflicts with a version npmjs also has.
+  '@vertekum/*':
+    access: $all
+    publish: $all
+    unpublish: $all
+  '@vertekum-ui/*':
+    access: $all
+    publish: $all
+    unpublish: $all
+  '@aceify/*':
+    access: $all
+    publish: $all
+    unpublish: $all
+  'vertekum':
+    access: $all
+    publish: $all
+    unpublish: $all
+  'aceify':
+    access: $all
+    publish: $all
+    unpublish: $all
   '@*/*':
     access: $all
     publish: $all

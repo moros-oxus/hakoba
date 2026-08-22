@@ -18,5 +18,15 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/moros-oxus/hakoba"
+  },
+  "scripts": {
+    "changeset": "changeset",
+    "changeset:status": "changeset status",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^1.0.0",
+    "@changesets/cli": "^3.0.1"
   }
 }

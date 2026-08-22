@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency: release-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  # npm Trusted Publishing: the job authenticates to the registry via an OIDC token
+  # exchange — no long-lived NPM_TOKEN secret — and npm attaches provenance automatically.
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Node 24 for its npm ≥ 11.5, the floor for trusted publishing.
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The publish gate: hakoba has no test suite yet, so the floor is a syntax check
+      # over every module plus the CLI actually booting.
+      - run: |
+          for f in bin/*.mjs src/*.mjs; do node --check "$f"; done
+          node bin/hakoba.mjs --help >/dev/null
+      # While changesets accumulate this maintains the "Version Packages" PR;
+      # when that PR merges, it publishes the bumped package instead.
+      - uses: changesets/action@v1
+        with:
+          version: pnpm release:version
+          publish: pnpm release:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # `changeset publish` creates the release tag in this checkout, but the action only
+      # pushes it (and creates a GitHub release) when it can parse the publish output —
+      # which pnpm's spinner UI defeats. These fallbacks are deterministic instead:
+      # push whatever tags point at HEAD, then create a GitHub release for any pushed tag
+      # that lacks one, with the CHANGELOG section as its body. No-ops when nothing published.
+      - name: Push release tags
+        run: git push origin --tags
+      - name: Ensure GitHub releases exist for new tags
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for tag in $(git tag --points-at HEAD); do
+            gh release view "$tag" --json tagName >/dev/null 2>&1 && continue
+            version="${tag##*@}"; version="${version#v}"
+            notes="Patch release."
+            if [ -f CHANGELOG.md ]; then
+              notes=$(awk -v v="## $version" 'index($0,v)==1{f=1;next} /^## /{f=0} f' CHANGELOG.md)
+            fi
+            gh release create "$tag" --title "$tag" --notes "$notes"
+          done

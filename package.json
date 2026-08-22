@@ -2,6 +2,7 @@
   "name": "hakoba",
   "version": "0.2.1",
   "description": "Local dev-registry bridge (Verdaccio) with per-repo attach/detach and publish",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "hakoba": "./bin/hakoba.mjs"

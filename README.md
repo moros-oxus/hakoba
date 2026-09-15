@@ -77,6 +77,12 @@ Publish this workspace's packages to the registry
 > (unpublish-first, so a stable version is overwritten
 in place), then **push** to every attached repo that routes one of them — their `node_modules` pick up
 the new build immediately, with no lockfile churn in git.
+>
+> Each package's `@scope` is routed at the local registry **on the command line**, because a
+`--registry` flag loses to a `@scope:registry=` line in an `.npmrc` under pnpm — so a repo that points
+its own scope at a company feed still publishes here, and its `.npmrc` is left alone. Every publish is
+then verified against the registry: a package that did not arrive fails the command instead of
+reporting success.
 
 
 

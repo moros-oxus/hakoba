@@ -34,11 +34,43 @@ export async function detectAgent(cwd) {
  * `null` means "we don't know how to publish with this agent"; the caller falls back to npm and says
  * so, rather than inventing a command line.
  */
+/**
+ * Scoped registry config, on the command line: `--@scope:registry=<url>`.
+ *
+ * `--registry` alone is not enough. Under pnpm, a `@scope:registry=` line in any `.npmrc` that
+ * applies — the package's, the workspace root's, the user's — OUTRANKS the flag, so publishing from
+ * a repo that routes its own scope at a real registry (a company feed) goes there instead of here,
+ * and says "published". CLI config outranks every file, for both supported managers, so the scope
+ * is repeated as a flag. (`publishConfig.registry` needs no handling: it loses to the flag.)
+ */
+function scopeArgs(scopes, registry) {
+  return scopes.map((scope) => `--${scope}:registry=${registry}`);
+}
+
 const PUBLISH = {
-  npm: (registry) => ['publish', '--registry', registry],
+  npm: (registry, scopes) => [
+    'publish',
+    '--registry',
+    registry,
+    ...scopeArgs(scopes, registry),
+  ],
   // --no-git-checks: hakoba publishes work in progress, which is the whole point.
-  pnpm: (registry) => ['publish', '--registry', registry, '--no-git-checks'],
-  'pnpm@6': (registry) => ['publish', '--registry', registry, '--no-git-checks'],
+  pnpm: (registry, scopes) => [
+    'publish',
+    '--registry',
+    registry,
+    '--no-git-checks',
+    ...scopeArgs(scopes, registry),
+  ],
+  'pnpm@6': (registry, scopes) => [
+    'publish',
+    '--registry',
+    registry,
+    '--no-git-checks',
+    ...scopeArgs(scopes, registry),
+  ],
+  // yarn and bun keep the arguments they had: their precedence is untested, and only pnpm and npm
+  // are supported — inventing flags on their behalf would be guessing.
   yarn: (registry) => ['publish', '--registry', registry, '--non-interactive'],
   // Berry moved npm-facing commands under `yarn npm`, and takes the registry from config only.
   'yarn@berry': null,
@@ -49,15 +81,16 @@ const PUBLISH = {
 };
 
 /**
- * The command to publish from `dir` with `agent`. Returns `{ cmd, args, note? }` — `note` is set when
- * we fell back to npm, so the caller can tell the user why.
+ * The command to publish from `dir` with `agent`, routing `scopes` (the `@scope`s of what is being
+ * published) at the registry. Returns `{ cmd, args, note? }` — `note` is set when we fell back to
+ * npm, so the caller can tell the user why.
  */
-export function publishCommand(agent, registry) {
+export function publishCommand(agent, registry, scopes = []) {
   const build = PUBLISH[agent];
-  if (build) return { cmd: agentBin(agent), args: build(registry) };
+  if (build) return { cmd: agentBin(agent), args: build(registry, scopes) };
   return {
     cmd: 'npm',
-    args: PUBLISH.npm(registry),
+    args: PUBLISH.npm(registry, scopes),
     note: `${agent} has no publish command hakoba knows — using npm`,
   };
 }

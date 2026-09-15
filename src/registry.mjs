@@ -65,6 +65,16 @@ export async function localPackages() {
   }
 }
 
+/**
+ * Does the registry hold this exact version? Asked after every publish, because a publish that
+ * reports success is not proof that it landed HERE: a package manager can resolve a different
+ * registry than the one hakoba asked for, and the registry's own answer is the only honest check.
+ */
+export async function hasVersion(name, version) {
+  const path = `/${name.replace('/', '%2f')}/${version}`;
+  return (await httpGet(path)).status === 200;
+}
+
 /** Put an auth token for the local registry in `~/.npmrc`, so publishes are allowed. */
 export function ensureToken() {
   const rc = join(homedir(), '.npmrc');

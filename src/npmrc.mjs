@@ -42,16 +42,25 @@ export function strip(text) {
   return out.join('\n');
 }
 
-/** Build the `.npmrc` lines that route the chosen packages at the registry. */
-export function routingLines(names, registry) {
-  const lines = [];
+/**
+ * The `@scope`s a set of package names touches, and whether any of them is unscoped. Routing needs
+ * this twice — for the `.npmrc` block that makes a consumer READ from the registry, and for the
+ * scoped config that makes a publish WRITE to it — so it has one definition.
+ */
+export function scopesOf(names) {
   const scopes = new Set();
   let unscoped = false;
   for (const name of names) {
     if (name.startsWith('@')) scopes.add(name.split('/')[0]);
     else unscoped = true;
   }
-  for (const scope of scopes) lines.push(`${scope}:registry=${registry}`);
+  return { scopes: [...scopes], unscoped };
+}
+
+/** Build the `.npmrc` lines that route the chosen packages at the registry. */
+export function routingLines(names, registry) {
+  const { scopes, unscoped } = scopesOf(names);
+  const lines = scopes.map((scope) => `${scope}:registry=${registry}`);
   if (unscoped) lines.push(`registry=${registry}`);
   return lines;
 }

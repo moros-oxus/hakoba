@@ -56,10 +56,18 @@ export async function publish(cwd, opts) {
   if (!chosen.length) return ui.log.warn('nothing selected');
 
   const agent = await detectAgent(cwd);
-  const { cmd, args, note } = publishCommand(agent, REGISTRY);
-  if (note) ui.log.warn(note);
+  let noted = false;
+  const missing = [];
 
   for (const pkg of chosen) {
+    // Per package, because the scope is part of the command: a `--registry` flag alone loses to a
+    // `@scope:registry=` line in the repo's own `.npmrc` under pnpm (see pm.mjs).
+    const { scopes } = npmrc.scopesOf([pkg.name]);
+    const { cmd, args, note } = publishCommand(agent, REGISTRY, scopes);
+    if (note && !noted) {
+      ui.log.warn(note);
+      noted = true;
+    }
     // Unpublish first so a stable version can be overwritten in place — no dev tags, so consumers'
     // version ranges never have to change to see the new build.
     const prior = unpublishCommand(`${pkg.name}@${pkg.version}`, REGISTRY);
@@ -67,6 +75,20 @@ export async function publish(cwd, opts) {
     // package context and rejects it ("Invalid name") — and the swallow would hide that.
     shPmOk(prior.cmd, prior.args, { cwd: tmpdir() });
     shPm(cmd, args, { cwd: pkg.dir });
+    if (!(await registry.hasVersion(pkg.name, pkg.version))) missing.push(pkg);
+  }
+
+  // A publish that went somewhere else must never read as success.
+  if (missing.length) {
+    for (const pkg of missing) {
+      const [scope] = npmrc.scopesOf([pkg.name]).scopes;
+      ui.log.error(
+        `${pkg.name}@${pkg.version} is not in ${REGISTRY} after publishing — something routed it elsewhere` +
+          (scope ? `; look for a ${scope}:registry= line in .npmrc or ~/.npmrc` : ''),
+      );
+    }
+    process.exitCode = 1;
+    return;
   }
   ui.log.success(`published ${chosen.map((p) => p.name).join(', ')} → ${REGISTRY}`);
 

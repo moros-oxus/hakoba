@@ -67,6 +67,25 @@ npm ships a manifest still saying `workspace:*`, which no consumer can resolve.
 **Unpublishing uses npm**, on purpose — it is a plain registry call with no workspace semantics, and the
 alternatives delegate anyway (`pnpm unpublish --help` prints *"Usage: npm unpublish"*).
 
+**`--registry` is not enough, so the scope is routed on the command line too.** Which registry a
+publish actually reaches is decided by a precedence order that differs between managers (verified
+2026-09-15, pnpm 10.33 / npm 11.11):
+
+| | pnpm | npm |
+| --- | --- | --- |
+| `@scope:registry=` in an applicable `.npmrc` | **wins** over the flag | loses to the flag |
+| `--registry <url>` | loses to a scoped line | **wins** |
+| `publishConfig.registry` in `package.json` | loses to the flag | loses to the flag |
+
+So a repo that routes its own scope at a real registry — a company feed in its committed `.npmrc` —
+would swallow `publish --registry <hakoba>` under pnpm and publish there instead. hakoba therefore
+passes `--@scope:registry=<hakoba>` for each scope it is publishing: CLI config outranks every file,
+for both managers. `publishConfig` needs no handling; it loses either way.
+
+Because that is a *class* of bug rather than one rule, every publish is then checked against the
+registry itself (`hasVersion`): a package that isn't there afterwards fails the run and names the
+likely `@scope:registry` line, rather than reporting a success that went elsewhere.
+
 **Spawned managers get a clean environment.** A package manager exports its settings as `npm_config_*`,
 and every manager reads `npm_config_*` back in — so running hakoba under one and spawning another hands
 the second the first one's config, which is where `npm warn Unknown env config "verify-deps-before-run"`

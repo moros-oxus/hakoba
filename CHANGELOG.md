@@ -1,5 +1,11 @@
 # hakoba
 
+## 0.2.3
+
+### Patch Changes
+
+- [`d5cca49`](https://github.com/moros-oxus/hakoba/commit/d5cca49913a8a1e3e75db357f57f0461a1fa4822) - `publish` now routes each package's scope at the local registry on the command line, so publishing from a repo whose `.npmrc` points its own scope at another registry (a company feed) lands here rather than silently going there. Every publish is then verified against the registry, and a package that did not arrive fails the run instead of reporting success.
+
 ## 0.2.2
 
 ### Patch Changes
